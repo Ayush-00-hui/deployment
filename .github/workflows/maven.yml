@@ -1,4 +1,4 @@
-name: Java CI with Maven and Docker
+name: Java CI with Maven, Docker & SonarQube
 
 on:
   push:
@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full clone needed for SonarQube analysis
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
@@ -26,6 +28,11 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B clean package --file pom.xml
+
+    - name: SonarQube Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B sonar:sonar -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || 'payment-action' }} -Dsonar.organization=${{ vars.SONAR_ORGANIZATION || 'default' }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -52,3 +59,30 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    # Continuous Deployment to AWS EC2 via SSH
+    - name: Deploy to AWS EC2 via SSH
+      if: github.event_name != 'pull_request'
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME || 'ubuntu' }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Navigate to project directory (create if it doesn't exist)
+          mkdir -p /home/ubuntu/deployment
+          cd /home/ubuntu/deployment
+          
+          # Initialize or pull latest source code from git
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/${{ github.repository }}.git .
+          else
+            git pull origin main
+          fi
+          
+          # Log into GHCR on EC2 using workflow token to allow pulling private images
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Pull the updated container images and restart the stack
+          docker compose pull
+          docker compose up -d
