@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Action Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .export-section {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-around;
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px dashed rgba(59, 130, 246, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .export-section {
+                grid-column: auto;
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        .export-btn {
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: rgba(234, 179, 8, 0.2); color: #fbbf24; }
+        .status-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-failed { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .status-refunded { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+
+        .json-preview {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            max-height: 250px;
+            color: #38bdf8;
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 100;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Payment Action Hub</h1>
+        <p>Manage, Process, and Export your MongoDB Payment Transactions</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Section 1: Create Payment -->
+        <div class="card">
+            <h2>Create New Payment</h2>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" class="form-control" placeholder="e.g. 150.00" step="0.01" required value="100.00">
+                </div>
+                <div class="form-group">
+                    <label for="currency">Currency</label>
+                    <input type="text" id="currency" class="form-control" placeholder="e.g. USD" required value="USD">
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <select id="paymentMethod" class="form-control">
+                        <option value="CREDIT_CARD">Credit Card</option>
+                        <option value="PAYPAL">PayPal</option>
+                        <option value="UPI">UPI</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Customer Email</label>
+                    <input type="email" id="customerEmail" class="form-control" placeholder="e.g. customer@domain.com" required value="buyer@example.com">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Initiate Payment</button>
+            </form>
+        </div>
+
+        <!-- Section 2: Active Transaction State -->
+        <div class="card" id="stateCard">
+            <h2>
+                Active Transaction
+                <span id="activeStatus" class="status-badge status-pending" style="display: none;">PENDING</span>
+            </h2>
+            <div id="noActive" style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                No transaction active. Initiate one on the left.
+            </div>
+            <div id="activeDetails" style="display: none;">
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <div id="txIdVal" style="font-weight: 600; font-size: 1.1rem; color: #a78bfa;">PAY-XXXXXX</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="btnProcess">Process Payment</button>
+                    <button class="btn btn-secondary" id="btnRefund" disabled>Refund Payment</button>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <label style="display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">JSON Response Preview</label>
+                    <pre id="jsonPreview" class="json-preview">...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Collective Database Download -->
+        <div class="card export-section">
+            <a href="/api/payments/export/excel" class="btn btn-primary export-btn" download>
+                📥 Download Excel File (.xlsx)
+            </a>
+            <a href="/api/payments/export/json" class="btn btn-secondary export-btn" download>
+                📋 Download JSON File (.json)
+            </a>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">Payment Created!</div>
+
+    <script>
+        let currentTxId = '';
+
+        const showNotification = (msg, color = 'var(--primary)') => {
+            const el = document.getElementById('notification');
+            el.innerText = msg;
+            el.style.borderLeftColor = color;
+            el.style.display = 'block';
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        };
+
+        const updateStatusUI = (status) => {
+            const badge = document.getElementById('activeStatus');
+            badge.innerText = status;
+            badge.className = 'status-badge';
+            if (status === 'PENDING') {
+                badge.classList.add('status-pending');
+                document.getElementById('btnProcess').disabled = false;
+                document.getElementById('btnRefund').disabled = true;
+            } else if (status === 'SUCCESS') {
+                badge.classList.add('status-success');
+                document.getElementById('btnProcess').disabled = true;
+                document.getElementById('btnRefund').disabled = false;
+            } else if (status === 'FAILED') {
+                badge.classList.add('status-failed');
+                document.getElementById('btnProcess').disabled = true;
+                document.getElementById('btnRefund').disabled = true;
+            } else if (status === 'REFUNDED') {
+                badge.classList.add('status-refunded');
+                document.getElementById('btnProcess').disabled = true;
+                document.getElementById('btnRefund').disabled = true;
+            }
+        };
+
+        // Form Submit -> Initiate Payment
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                amount: parseFloat(document.getElementById('amount').value),
+                currency: document.getElementById('currency').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                customerEmail: document.getElementById('customerEmail').value
+            };
+
+            try {
+                const response = await fetch('/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const resData = await response.json();
+                
+                currentTxId = resData.transactionId;
+                document.getElementById('txIdVal').innerText = currentTxId;
+                document.getElementById('jsonPreview').innerText = JSON.stringify(resData, null, 2);
+                
+                document.getElementById('noActive').style.display = 'none';
+                document.getElementById('activeDetails').style.display = 'block';
+                document.getElementById('activeStatus').style.display = 'inline-block';
+                updateStatusUI(resData.status);
+                showNotification('Payment Initiated! Transaction ID: ' + currentTxId, 'var(--primary)');
+            } catch (err) {
+                console.error(err);
+                showNotification('Error creating payment', 'var(--danger)');
+            }
+        });
+
+        // Process Button
+        document.getElementById('btnProcess').addEventListener('click', async () => {
+            if (!currentTxId) return;
+            try {
+                const response = await fetch(`/api/payments/${currentTxId}/process`, {
+                    method: 'POST'
+                });
+                const resData = await response.json();
+                document.getElementById('jsonPreview').innerText = JSON.stringify(resData, null, 2);
+                updateStatusUI(resData.status);
+                if (resData.status === 'SUCCESS') {
+                    showNotification('Payment processed successfully!', 'var(--success)');
+                } else {
+                    showNotification('Payment failed (mock rule amount == 99.99)!', 'var(--danger)');
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('Error processing payment', 'var(--danger)');
+            }
+        });
+
+        // Refund Button
+        document.getElementById('btnRefund').addEventListener('click', async () => {
+            if (!currentTxId) return;
+            try {
+                const response = await fetch(`/api/payments/${currentTxId}/refund`, {
+                    method: 'POST'
+                });
+                const resData = await response.json();
+                document.getElementById('jsonPreview').innerText = JSON.stringify(resData, null, 2);
+                updateStatusUI(resData.status);
+                showNotification('Payment refunded!', 'var(--accent)');
+            } catch (err) {
+                console.error(err);
+                showNotification('Error refunding payment', 'var(--danger)');
+            }
+        });
+    </script>
+</body>
+</html>
