@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:6.0
@@ -16,7 +14,7 @@ services:
     build: .
     container_name: payment-app
     ports:
-      - "8080:8080"
+      - "80:8080"  # Expose on standard HTTP port 80 externally
     depends_on:
       - mongodb
     environment:
@@ -25,8 +23,29 @@ services:
       - payment-network
     restart: on-failure
 
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: payment-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonar-data:/opt/sonarqube/data
+      - sonar-logs:/opt/sonarqube/logs
+      - sonar-extensions:/opt/sonarqube/extensions
+    networks:
+      - payment-network
+    restart: unless-stopped
+
 volumes:
   mongo-data:
+    driver: local
+  sonar-data:
+    driver: local
+  sonar-logs:
+    driver: local
+  sonar-extensions:
     driver: local
 
 networks:
