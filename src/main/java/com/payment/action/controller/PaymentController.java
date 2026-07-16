@@ -40,6 +40,24 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/export/json")
+    public ResponseEntity<byte[]> exportPaymentsToJson() {
+        byte[] data = paymentService.exportPaymentsToJson();
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=payments.json")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(data);
+    }
+
+    @GetMapping("/export/excel")
+    public ResponseEntity<byte[]> exportPaymentsToExcel() {
+        byte[] data = paymentService.exportPaymentsToExcel();
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=payments.xlsx")
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(data);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
