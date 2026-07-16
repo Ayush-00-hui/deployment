@@ -30,6 +30,7 @@ jobs:
       run: mvn -B clean package --file pom.xml
 
     - name: SonarQube Analysis
+      continue-on-error: true  # Prevents deployment from blocking if SonarCloud is down (504 Error)
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B sonar:sonar -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || 'payment-action' }} -Dsonar.organization=${{ vars.SONAR_ORGANIZATION || 'default' }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }}
